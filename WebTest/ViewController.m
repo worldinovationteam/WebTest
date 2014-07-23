@@ -27,7 +27,7 @@
     [self.view addSubview:textField];
     
     label=[[UILabel alloc]init];
-    label.frame=CGRectMake(100, 300, 150, 40);
+    label.frame=CGRectMake(100, 150, 150, 40);
     label.text=@"相手探索中";
     [self.view addSubview:label];
     
@@ -48,10 +48,8 @@
     [connector findPartner];
     [connector createP2PSocket];
     
-    count=0;
-    
     [NSThread detachNewThreadSelector:@selector(waitForPartner) toTarget:connector withObject:nil];
-    
+    [connector sendPartnerMessage:@"相手発見！"];
 }
 
 -(IBAction)reloadText:(id)sender{

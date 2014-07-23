@@ -14,7 +14,6 @@
 @interface ViewController : UIViewController<UITextFieldDelegate>{
     UDPConnector* connector;
     UILabel* label;
-    int count;
 }
 
 @end
