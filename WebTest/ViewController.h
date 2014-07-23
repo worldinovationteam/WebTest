@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TimeDataHandler.h"
+#import "XMLDelegate.h"
+#import "UDPConnector.h"
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController<UITextFieldDelegate>{
+    UDPConnector* connector;
+    UILabel* label;
+    int count;
+}
 
 @end

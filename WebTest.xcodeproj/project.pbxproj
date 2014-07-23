@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		262E44F71972129900E15191 /* XMLDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 262E44F61972129900E15191 /* XMLDelegate.m */; };
 		2641E07E196699110087E12F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2641E07D196699110087E12F /* Foundation.framework */; };
 		2641E080196699110087E12F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2641E07F196699110087E12F /* CoreGraphics.framework */; };
 		2641E082196699110087E12F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2641E081196699110087E12F /* UIKit.framework */; };
 		2641E088196699110087E12F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2641E086196699110087E12F /* InfoPlist.strings */; };
 		2641E08A196699110087E12F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2641E089196699110087E12F /* main.m */; };
 		2641E08E196699110087E12F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2641E08D196699110087E12F /* AppDelegate.m */; };
-		2641E091196699110087E12F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2641E08F196699110087E12F /* Main.storyboard */; };
 		2641E094196699110087E12F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2641E093196699110087E12F /* ViewController.m */; };
 		2641E096196699110087E12F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2641E095196699110087E12F /* Images.xcassets */; };
 		2641E09D196699110087E12F /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2641E09C196699110087E12F /* XCTest.framework */; };
@@ -21,6 +21,8 @@
 		2641E09F196699110087E12F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2641E081196699110087E12F /* UIKit.framework */; };
 		2641E0A7196699110087E12F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2641E0A5196699110087E12F /* InfoPlist.strings */; };
 		2641E0A9196699110087E12F /* WebTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2641E0A8196699110087E12F /* WebTestTests.m */; };
+		2641E0C819669B390087E12F /* TimeDataHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2641E0C719669B390087E12F /* TimeDataHandler.m */; };
+		26426BD519758E5900DB7EA5 /* UDPConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = 26426BD419758E5900DB7EA5 /* UDPConnector.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +36,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		262E44F51972129900E15191 /* XMLDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLDelegate.h; sourceTree = "<group>"; };
+		262E44F61972129900E15191 /* XMLDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLDelegate.m; sourceTree = "<group>"; };
 		2641E07A196699110087E12F /* WebTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WebTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2641E07D196699110087E12F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		2641E07F196699110087E12F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -44,7 +48,6 @@
 		2641E08B196699110087E12F /* WebTest-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WebTest-Prefix.pch"; sourceTree = "<group>"; };
 		2641E08C196699110087E12F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		2641E08D196699110087E12F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		2641E090196699110087E12F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2641E092196699110087E12F /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		2641E093196699110087E12F /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		2641E095196699110087E12F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -53,6 +56,10 @@
 		2641E0A4196699110087E12F /* WebTestTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "WebTestTests-Info.plist"; sourceTree = "<group>"; };
 		2641E0A6196699110087E12F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		2641E0A8196699110087E12F /* WebTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebTestTests.m; sourceTree = "<group>"; };
+		2641E0C619669B390087E12F /* TimeDataHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeDataHandler.h; sourceTree = "<group>"; };
+		2641E0C719669B390087E12F /* TimeDataHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeDataHandler.m; sourceTree = "<group>"; };
+		26426BD319758E5900DB7EA5 /* UDPConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDPConnector.h; sourceTree = "<group>"; };
+		26426BD419758E5900DB7EA5 /* UDPConnector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UDPConnector.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,11 +121,16 @@
 			children = (
 				2641E08C196699110087E12F /* AppDelegate.h */,
 				2641E08D196699110087E12F /* AppDelegate.m */,
-				2641E08F196699110087E12F /* Main.storyboard */,
 				2641E092196699110087E12F /* ViewController.h */,
 				2641E093196699110087E12F /* ViewController.m */,
 				2641E095196699110087E12F /* Images.xcassets */,
 				2641E084196699110087E12F /* Supporting Files */,
+				2641E0C619669B390087E12F /* TimeDataHandler.h */,
+				2641E0C719669B390087E12F /* TimeDataHandler.m */,
+				262E44F51972129900E15191 /* XMLDelegate.h */,
+				262E44F61972129900E15191 /* XMLDelegate.m */,
+				26426BD319758E5900DB7EA5 /* UDPConnector.h */,
+				26426BD419758E5900DB7EA5 /* UDPConnector.m */,
 			);
 			path = WebTest;
 			sourceTree = "<group>";
@@ -230,7 +242,6 @@
 			files = (
 				2641E096196699110087E12F /* Images.xcassets in Resources */,
 				2641E088196699110087E12F /* InfoPlist.strings in Resources */,
-				2641E091196699110087E12F /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,9 +260,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2641E0C819669B390087E12F /* TimeDataHandler.m in Sources */,
 				2641E094196699110087E12F /* ViewController.m in Sources */,
 				2641E08E196699110087E12F /* AppDelegate.m in Sources */,
+				262E44F71972129900E15191 /* XMLDelegate.m in Sources */,
 				2641E08A196699110087E12F /* main.m in Sources */,
+				26426BD519758E5900DB7EA5 /* UDPConnector.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,14 +294,6 @@
 				2641E087196699110087E12F /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		2641E08F196699110087E12F /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				2641E090196699110087E12F /* Base */,
-			);
-			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 		2641E0A5196699110087E12F /* InfoPlist.strings */ = {
@@ -456,6 +462,7 @@
 				2641E0AE196699110087E12F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2641E0AF196699110087E12F /* Build configuration list for PBXNativeTarget "WebTestTests" */ = {
 			isa = XCConfigurationList;
@@ -464,6 +471,7 @@
 				2641E0B1196699110087E12F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
