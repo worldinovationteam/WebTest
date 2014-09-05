@@ -9,11 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "TimeDataHandler.h"
 #import "XMLDelegate.h"
-#import "UDPConnector.h"
+#import "P2PConnector.h"
 
 @interface ViewController : UIViewController<UITextFieldDelegate>{
-    UDPConnector* connector;
+    P2PConnector* connector;
     UILabel* label;
+    UILabel* isTalking;
+    UIButton* call;
+    UIButton* hangUp;
+    CGSize screenSize;
 }
 
 @end
