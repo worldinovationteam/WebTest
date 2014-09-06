@@ -8,7 +8,7 @@
 //<使い方>
 //1. initServerSocketWithAddr:AndPort: でまずマッチングサーバーのIPアドレスとポート番号を指定
 //2. initClientSocketWithPort:　で自分のiPhoneの通信用ポート番号を指定
-//3. findPartner で通信相手探索（このときスレッドの処理は相手が見つかるまで停止）見つかったらpartAddrに値が書き込まれる
+//3. findPartner で通信相手探索（このときスレッドの処理は相手が見つかるまで停止）見つかったらpartAddrに値が書き込まれ、flgが1か2になる
 //4. createP2PSocket でP2P通信用の準備をする
 //5. waitForPartner で相手からのパケットを待つ。受信したものがメッセージだったらreceiveBufに格納(最大サイズP2PBUF)
 //6. startSendingVoice で音声の送受信を開始。(talkingがYESになる)

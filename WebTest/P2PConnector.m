@@ -245,7 +245,8 @@ void AudioInputCallback(
                                UInt32 inNumberPacketDescriptions,
                                const AudioStreamPacketDescription *inPacketDescs){
     //マイク用バッファがいっぱいになったら相手に送る
-    sendto(exP2PSocket, (char*)inBuffer->mAudioData, P2PBUF, 0, (struct sockaddr*)&expartAddr, sizeof(expartAddr));
+    char* datapt= (char *)(inBuffer->mAudioData);
+    sendto(exP2PSocket, datapt, P2PBUF, 0, (struct sockaddr*)&expartAddr, sizeof(expartAddr));
     AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
 }
 
@@ -256,6 +257,7 @@ void AudioOutputCallback (
                                  ){
     //スピーカ用バッファが空いたら相手からのデータを入れる
     char* datapt= (char *)(inBuffer->mAudioData);
+    inBuffer->mAudioDataByteSize=P2PBUF;
     for(int i=0; i<P2PBUF; i++){
         datapt[i]=receivedData[i];
     }
