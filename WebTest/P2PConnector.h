@@ -33,7 +33,6 @@
     struct sockaddr_in partAddr;
     int       P2PSocket;
     int       flg;
-    char receivedData[P2PBUF];
     NSString* receiveBuf;
     BOOL isTalking;
 }
@@ -53,7 +52,7 @@
 -(BOOL)startSendingVoice;
 -(BOOL)hangUp;
 -(BOOL)createP2PSocket;
--(void)closeP2PSocket;
+-(BOOL)closeP2PSocket;
 -(BOOL)waitForPartner;
 
 @end

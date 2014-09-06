@@ -61,8 +61,13 @@
     connector=[[P2PConnector alloc]init];
     [connector initServerSocketWithAddr:@"153.121.70.32" AndPort:5000];
     [connector initClientSocketWithPort:6000];
-    [connector findPartner];
-    [connector createP2PSocket];
+    if( [connector findPartner]==NO ){
+        return;
+    }
+    
+    if( [connector createP2PSocket]==NO ){
+        return;
+    }
     
     [NSThread detachNewThreadSelector:@selector(waitForPartner) toTarget:connector withObject:nil];
     [connector sendPartnerMessage:@"P2P通信開始！"];

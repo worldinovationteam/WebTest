@@ -60,6 +60,7 @@ AudioQueueRef inQueue,outQueue;
     if(sendto(sockfd, msg, strlen(msg), 0, (struct sockaddr*)&servAddr, sizeof(servAddr))<0){
         NSLog(@"failed");
         close(sockfd);
+        return NO;
     }else{
         NSLog(@"ok");
     }
@@ -125,8 +126,9 @@ AudioQueueRef inQueue,outQueue;
     return YES;
 }
 
--(void)closeP2PSocket{
+-(BOOL)closeP2PSocket{
     close(P2PSocket);
+    return YES;
 }
 
 -(BOOL)sendPartnerMessage:(NSString *)message{
@@ -148,20 +150,20 @@ AudioQueueRef inQueue,outQueue;
     //データを受信
     socklen_t addrlen = sizeof(partAddr);
     while (1) {
-        NSLog(@"waiting from partner");
         recvfrom(P2PSocket, receivedData, sizeof(receivedData) - 1, 0,
                  (struct sockaddr *)&partAddr, &addrlen);
         //データの種類を識別
         if( receivedData[0]=='#' && receivedData[1]=='m' && receivedData[2]=='s' && receivedData[3]=='g' && receivedData[4]=='#' ){
-            receiveBuf = [[NSString stringWithUTF8String:receivedData] substringFromIndex:4];
+            receiveBuf = [[NSString stringWithUTF8String:receivedData] substringFromIndex:5];
+            NSLog(@"received message: %@",receiveBuf);
         }else if( receivedData[0]=='#' && receivedData[1]=='h' && receivedData[2]=='u' && receivedData[3]=='p' && receivedData[4]=='#' ){
             AudioQueueStop(inQueue, true);
             AudioQueueStop(outQueue, true);
             AudioQueueDispose(inQueue, true);
             AudioQueueDispose(outQueue, true);
             isTalking=NO;
+            NSLog(@"partner has hung up");
         }
-        NSLog(@"received message:%@",receiveBuf);
     }
     return YES;
 }
@@ -195,12 +197,16 @@ AudioQueueRef inQueue,outQueue;
     //スピーカ用キューの開始
     stat=AudioQueueNewOutput(&dataFormat, AudioOutputCallback, NULL, NULL, NULL, 0, &outQueue);
     if( stat ){
-        printf("new %d\n",(int)stat);
+        printf("failed to make output queue %d\n",(int)stat);
         return NO;
     }
     
     for(int i=0; i<3; i++){
-        AudioQueueAllocateBuffer(outQueue,P2PBUF,outBuffer+i);
+        stat=AudioQueueAllocateBuffer(outQueue,P2PBUF,outBuffer+i);
+        if( stat ){
+            printf("failed to allocate output buffers %d\n",(int)stat);
+            return NO;
+        }
         AudioOutputCallback(NULL, outQueue, outBuffer[i]);
     }
     
@@ -210,15 +216,15 @@ AudioQueueRef inQueue,outQueue;
     //マイク用キューの開始
     stat=AudioQueueNewInput(&dataFormat, AudioInputCallback, NULL, CFRunLoopGetCurrent(), kCFRunLoopCommonModes, 0, &inQueue);
     if( stat ){
-        printf("new %d\n",(int)stat);
+        printf("failed to make input queue %d\n",(int)stat);
         return NO;
     }
     
     for(int i=0; i<3; i++){
         stat=AudioQueueAllocateBuffer(inQueue,P2PBUF,inBuffer+i);
-        stat=AudioQueueEnqueueBuffer(inQueue,inBuffer[i],0,NULL);
+        AudioQueueEnqueueBuffer(inQueue,inBuffer[i],0,NULL);
         if( stat ){
-            printf("input enqueue %d\n",(int)stat);
+            printf("failed to allocate input buffers %d\n",(int)stat);
             return NO;
         }
     }
@@ -239,7 +245,7 @@ void AudioInputCallback(
                                UInt32 inNumberPacketDescriptions,
                                const AudioStreamPacketDescription *inPacketDescs){
     //マイク用バッファがいっぱいになったら相手に送る
-    sendto(exP2PSocket, (char*)(inBuffer->mAudioData), P2PBUF, 0, (struct sockaddr*)&expartAddr, sizeof(expartAddr));
+    sendto(exP2PSocket, (char*)inBuffer->mAudioData, P2PBUF, 0, (struct sockaddr*)&expartAddr, sizeof(expartAddr));
     AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
 }
 
@@ -253,6 +259,7 @@ void AudioOutputCallback (
     for(int i=0; i<P2PBUF; i++){
         datapt[i]=receivedData[i];
     }
+    AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
 }
 
 -(BOOL)hangUp{
@@ -262,11 +269,10 @@ void AudioOutputCallback (
     AudioQueueDispose(outQueue, true);
     isTalking=NO;
     
-    //通信切断を通知
+    //通信切断を通知（#hup#を相手に送る)
     char* msg="#hup#";
-    const char* msg2=strcat(msg,"\0");
     NSLog(@"hanging up...");
-    if(sendto(P2PSocket, msg2, strlen(msg2)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
+    if(sendto(P2PSocket, msg, strlen(msg)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
         NSLog(@"failed");
         return NO;
     }
