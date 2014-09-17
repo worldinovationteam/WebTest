@@ -15,7 +15,7 @@ int exP2PSocket;
 char receivedData[P2PBUF];
 AudioQueueRef inQueue,outQueue;
 
-@synthesize cliAddr, servAddr, partAddr, P2PSocket, flg, receiveBuf, isTalking;
+@synthesize cliAddr, servAddr, partAddr, P2PSocket, flg, receiveBuf, isTalking, ID;
 
 -(void)initServerSocketWithAddr:(NSString *)addr AndPort:(int)port{
     //サーバのアドレスを設定
@@ -37,7 +37,6 @@ AudioQueueRef inQueue,outQueue;
 
     char buf[SERVBUF];
     char senderstr[6];
-    char* msg="test";
     int sockfd;
 
     //UDPソケットをオープン
@@ -46,7 +45,7 @@ AudioQueueRef inQueue,outQueue;
         NSLog(@"can't open datagram socket");
         return NO;
     }
-    NSLog(@"sokcet opened");
+    NSLog(@"sokcet opened, sockfd= %d",sockfd);
     
     //ローカルアドレスのbind
     if(bind(sockfd,(struct sockaddr*)&cliAddr,sizeof(cliAddr))<0){
@@ -55,9 +54,17 @@ AudioQueueRef inQueue,outQueue;
         return NO;
     }
     
-    //パケット送出
+    //IDをサーバに送出
+    if( ID==nil ){
+        NSLog(@"ID is not set");
+        return NO;
+    }
+    NSString* ID2=[@"#mat#" stringByAppendingString:ID];
+    char* msg=(char*)[ID2 UTF8String];
+    const char* msg2=strcat(msg,"\0");
+    
     NSLog(@"sending to server...");
-    if(sendto(sockfd, msg, strlen(msg), 0, (struct sockaddr*)&servAddr, sizeof(servAddr))<0){
+    if(sendto(sockfd, msg2, strlen(msg2), 0, (struct sockaddr*)&servAddr, sizeof(servAddr))<0){
         NSLog(@"failed");
         close(sockfd);
         return NO;
@@ -65,12 +72,37 @@ AudioQueueRef inQueue,outQueue;
         NSLog(@"ok");
     }
     
-    //データを受信
-    socklen_t addrlen = sizeof(servAddr);
-    recvfrom(sockfd, buf, sizeof(buf), 0,
-                 (struct sockaddr *)&servAddr, &addrlen);
+    //タイムアウトTIMEOUT秒でサーバからの応答を待つ
+    struct timeval timeout;
+    timeout.tv_sec = TIMEOUT;
+    timeout.tv_usec = 0;
     
-    // 送信元に関する情報を表示、パートナーのIPアドレスとポート番号を取得
+    fd_set readfds;
+    FD_ZERO(&readfds);
+    FD_SET(sockfd, &readfds);
+    
+    int n=select(0, &readfds, NULL, NULL, &timeout);
+    if( n<0 ){
+        NSLog(@"failed to select sockets");
+        close(sockfd);
+        return NO;
+    }else if( n==0 ){
+        NSLog(@"run out of time to wait for server");
+        close(sockfd);
+        return NO;
+    }
+    
+    if( FD_ISSET(sockfd, &readfds) ){
+        socklen_t addrlen = sizeof(servAddr);
+        if( recvfrom(sockfd, buf, sizeof(buf), 0,
+                     (struct sockaddr *)&servAddr, &addrlen)<0 ){
+            NSLog(@"failed to receive from server");
+            close(sockfd);
+            return NO;
+        }
+    }
+
+    //サーバからの情報を表示、パートナーのIPアドレスとポート番号を取得
     inet_ntop(AF_INET, &servAddr.sin_addr, senderstr, sizeof(senderstr));
     NSLog(@"%@",[NSString stringWithFormat:@"from server : %s", buf]);
     close(sockfd);
@@ -106,7 +138,7 @@ AudioQueueRef inQueue,outQueue;
     return YES;
 }
 
--(BOOL)createP2PSocket{
+-(BOOL)prepareP2PConnection{
     
     //UDPソケットをオープン
     P2PSocket=socket(AF_INET,SOCK_DGRAM,0);
@@ -122,6 +154,122 @@ AudioQueueRef inQueue,outQueue;
         NSLog(@"can't bind local address");
         close(P2PSocket);
         return NO;
+    }
+    
+    //P2P通信完全開通のため、ダミーのパケットをやり取りする
+    //flg==1のときは相手に#ts1#をおくり、相手から応答の#ts2#がきたら終了
+    //flg==2のときは相手からの#ts1#を待ち、こないときは#ts1#を送る。もし来たら応答の#ts2#を送って終了
+    
+    if( flg==1 ){
+        if( [self confirmP2PConnectFlg1]==NO ){
+            NSLog(@"failed to make P2P connection");
+            return NO;
+        }
+    }else if( flg==2 ){
+        if( [self confirmP2PConnectFlg2]==NO ){
+            NSLog(@"failed to make P2P connection");
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
+-(BOOL)confirmP2PConnectFlg1{
+    
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 500000; //0.5秒でタイムアウト
+    fd_set readfds;
+    socklen_t addrlen = sizeof(partAddr);
+    
+    const char* msg1="#ts1#";
+
+    for( int i=0; i<10; i++ ){
+        
+        if(sendto(P2PSocket, msg1, strlen(msg1)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
+            NSLog(@"failed to send a dummy message");
+            return NO;
+        }
+        
+        FD_ZERO(&readfds);
+        FD_SET(P2PSocket, &readfds);
+        
+        int n=select(0, &readfds, NULL, NULL, &timeout);
+        if( n<0 ){
+            NSLog(@"failed to select sockets");
+            close(P2PSocket);
+            return NO;
+        }else if( n==0 ){
+            NSLog(@"retrying to make P2P connection...");
+            continue;
+        }
+        
+        if( FD_ISSET(P2PSocket, &readfds) ){
+            if( recvfrom(P2PSocket, receivedData, P2PBUF, 0,
+                         (struct sockaddr *)&partAddr, &addrlen)<0 ){
+                NSLog(@"failed to receive from partner");
+                close(P2PSocket);
+                return NO;
+            }else if( receivedData[0]=='#' && receivedData[1]=='t' && receivedData[2]=='s' && receivedData[3]=='2' && receivedData[4]=='#' ){
+                return YES;
+            }else{
+                continue;
+            }
+        }
+    }
+    return NO;
+}
+
+-(BOOL)confirmP2PConnectFlg2{
+    
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 500000; //0.5秒でタイムアウト
+    fd_set readfds;
+    socklen_t addrlen = sizeof(partAddr);
+    
+    const char* msg1="#ts1#";
+    const char* msg2="#ts2#";
+    
+    for( int i=0; i<10; i++ ){
+        
+        FD_ZERO(&readfds);
+        FD_SET(P2PSocket, &readfds);
+        
+        int n=select(0, &readfds, NULL, NULL, &timeout);
+        if( n<0 ){
+            NSLog(@"failed to select sockets");
+            close(P2PSocket);
+            return NO;
+        }else if( n==0 ){
+            NSLog(@"retrying to make P2P connection...");
+            if(sendto(P2PSocket, msg1, strlen(msg1)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
+                NSLog(@"failed to send a dummy message");
+                return NO;
+            }
+            continue;
+        }
+        
+        if( FD_ISSET(P2PSocket, &readfds) ){
+            if( recvfrom(P2PSocket, receivedData, P2PBUF, 0,
+                         (struct sockaddr *)&partAddr, &addrlen)<0 ){
+                NSLog(@"failed to receive from partner");
+                close(P2PSocket);
+                return NO;
+            }else if( receivedData[0]=='#' && receivedData[1]=='t' && receivedData[2]=='s' && receivedData[3]=='1' && receivedData[4]=='#' ){
+                if(sendto(P2PSocket, msg2, strlen(msg2)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
+                    NSLog(@"failed to send a dummy message");
+                    return NO;
+                }
+                return YES;
+            }else{
+                if(sendto(P2PSocket, msg1, strlen(msg1)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
+                    NSLog(@"failed to send a dummy message");
+                    return NO;
+                }
+            }
+        }
     }
     return YES;
 }
@@ -178,6 +326,9 @@ AudioQueueRef inQueue,outQueue;
     AudioQueueBufferRef inBuffer[3];
     AudioQueueBufferRef outBuffer[3];
     
+    //フォーマットの設定
+    /*
+    // Linear PCM 44100 Hz
     dataFormat.mSampleRate = 44100.0f;
     dataFormat.mFormatID = kAudioFormatLinearPCM;
     dataFormat.mFormatFlags = kLinearPCMFormatFlagIsBigEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
@@ -187,6 +338,18 @@ AudioQueueRef inQueue,outQueue;
     dataFormat.mChannelsPerFrame = 1;
     dataFormat.mBitsPerChannel = 16;
     dataFormat.mReserved = 0;
+     */
+
+    // IMA/ADPCM 16000 Hz
+    dataFormat.mSampleRate = 16000.0f;
+    dataFormat.mFormatID = kAudioFormatAppleIMA4;
+    dataFormat.mBytesPerPacket = 34;
+    dataFormat.mFormatFlags=0;
+    dataFormat.mFramesPerPacket = 64;
+    dataFormat.mBytesPerFrame = 0; //compressed dataにたいしては0
+    dataFormat.mChannelsPerFrame = 1;
+    dataFormat.mBitsPerChannel = 0; //compressed dataにたいしては0
+    
     OSStatus stat;
     
     //スピーカ用バッファのクリア
@@ -265,6 +428,11 @@ void AudioOutputCallback (
 }
 
 -(BOOL)hangUp{
+    if( isTalking==NO ){
+        NSLog(@"not talking now");
+        return NO;
+    }
+    
     AudioQueueStop(inQueue, true);
     AudioQueueStop(outQueue, true);
     AudioQueueDispose(inQueue, true);

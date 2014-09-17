@@ -17,11 +17,13 @@ void AudioInputtCallback(
                                 const AudioTimeStamp *inStartTime,
                                 UInt32 inNumberPacketDescriptions,
                                 const AudioStreamPacketDescription *inPacketDescs){
-    //printf("audio input\n");
+    NSLog(@"audio input");
     char *datapt=(char *)inBuffer->mAudioData;
     for(int i=0; i<PPBUF; i++){
-        data[i] = datapt[i]*3;
+        data[i] = datapt[i];
+        //printf("pt %d, %d\n",i,datapt[i]);
     }
+    //NSLog(@"ok");
     AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
 }
 
@@ -36,26 +38,27 @@ void AudioOutputtCallback (
     for(int i=0; i<PPBUF; i++){
         datapt[i]=data[i];
     }
-    AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
-    //printf("out queue %d\n",(int)stat);
+    OSStatus stat=AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
+    NSLog(@"out queue %d",(int)stat);
 }
 
 -(BOOL)startSendingVoice{
     AudioStreamBasicDescription dataFormat;
     AudioQueueRef inQueue,outQueue;
-    AudioQueueBufferRef inBuffer[3];
-    AudioQueueBufferRef outBuffer[3];
+    AudioQueueBufferRef inBuffer[NUMBUF];
+    AudioQueueBufferRef outBuffer[NUMBUF];
     
-    dataFormat.mSampleRate = 44100.0f;
-    dataFormat.mFormatID = kAudioFormatLinearPCM;
-    dataFormat.mFormatFlags = kLinearPCMFormatFlagIsBigEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
-    dataFormat.mBytesPerPacket = 2;
-    dataFormat.mFramesPerPacket = 1;
-    dataFormat.mBytesPerFrame = 2;
+    dataFormat.mSampleRate = 16000.0f;
+    dataFormat.mFormatID = kAudioFormatAppleIMA4;
+    dataFormat.mBytesPerPacket = 34;
+    dataFormat.mFormatFlags=0;
+    dataFormat.mFramesPerPacket = 64;
+    dataFormat.mBytesPerFrame = 0; //compressed dataにたいしては0
     dataFormat.mChannelsPerFrame = 1;
-    dataFormat.mBitsPerChannel = 16;
-    dataFormat.mReserved = 0;
+    dataFormat.mBitsPerChannel = 0; //compressed dataにたいしては0
     OSStatus stat;
+    
+    
     
     for(int i=0; i<PPBUF; i++){
         data[i]=0;
@@ -67,7 +70,7 @@ void AudioOutputtCallback (
         return NO;
     }
     
-    for(int i=0; i<3; i++){
+    for(int i=0; i<NUMBUF; i++){
         AudioQueueAllocateBuffer(outQueue,PPBUF,outBuffer+i);
         AudioOutputtCallback(NULL, outQueue, outBuffer[i]);
     }
@@ -81,7 +84,7 @@ void AudioOutputtCallback (
         return NO;
     }
     
-    for(int i=0; i<3; i++){
+    for(int i=0; i<NUMBUF; i++){
         stat=AudioQueueAllocateBuffer(inQueue,PPBUF,inBuffer+i);
         stat=AudioQueueEnqueueBuffer(inQueue,inBuffer[i],0,NULL);
         if( stat ){

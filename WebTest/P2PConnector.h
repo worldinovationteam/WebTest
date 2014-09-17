@@ -8,13 +8,14 @@
 //<使い方>
 //1. initServerSocketWithAddr:AndPort: でまずマッチングサーバーのIPアドレスとポート番号を指定
 //2. initClientSocketWithPort:　で自分のiPhoneの通信用ポート番号を指定
-//3. findPartner で通信相手探索（このときスレッドの処理は相手が見つかるまで停止）見つかったらpartAddrに値が書き込まれ、flgが1か2になる
-//4. createP2PSocket でP2P通信用の準備をする
-//5. waitForPartner で相手からのパケットを待つ。受信したものがメッセージだったらreceiveBufに格納(最大サイズP2PBUF)
-//6. startSendingVoice で音声の送受信を開始。(talkingがYESになる)
-//7. sendPartnerMessage: で相手にメッセージを送る。
-//8. hangUp で音声通話を切る。(talkingがNOになる。相手が切ってもNOになる)
-//8. 通信が終わったらcloseP2PSocketをする。
+//3. setID: で自分のIDナンバーを設定
+//4. findPartner で通信相手探索（このときスレッドの処理は相手が見つかるまで停止）見つかったらpartAddrに値が書き込まれ、flgが1か2になる
+//5. prepareP2PConnection でP2P通信用の準備をする
+//6. waitForPartner で相手からのパケットを待つ。受信したものがメッセージだったらreceiveBufに格納(最大サイズP2PBUF)
+//7. startSendingVoice で音声の送受信を開始。(talkingがYESになる)
+//8. sendPartnerMessage: で相手にメッセージを送る。
+//9. hangUp で音声通話を切る。(talkingがNOになる。相手が切ってもNOになる)
+//10. 通信が終わったらcloseP2PSocketをする。
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
@@ -24,8 +25,9 @@
 #import <arpa/inet.h>
 
 #define SERVBUF 128
-#define P2PBUF  8192
-
+#define P2PBUF 340
+#define TIMEOUT 3 //マッチングタイムアウトの秒数。(サーバー側は10秒でタイムアウトする)
+#define CALLOUT 3 //コールのタイムアウトの秒数。
 
 @interface P2PConnector : NSObject{
     struct sockaddr_in cliAddr;
@@ -35,6 +37,7 @@
     int       flg;
     NSString* receiveBuf;
     BOOL isTalking;
+    NSString* ID;
 }
 
 @property struct sockaddr_in cliAddr;
@@ -44,6 +47,7 @@
 @property int       flg;
 @property NSString* receiveBuf;
 @property BOOL isTalking;
+@property NSString* ID;
 
 -(void)initServerSocketWithAddr:(NSString*)addr AndPort:(int)port;
 -(void)initClientSocketWithPort:(int)port;
@@ -51,7 +55,7 @@
 -(BOOL)sendPartnerMessage:(NSString*)message;
 -(BOOL)startSendingVoice;
 -(BOOL)hangUp;
--(BOOL)createP2PSocket;
+-(BOOL)prepareP2PConnection;
 -(BOOL)closeP2PSocket;
 -(BOOL)waitForPartner;
 

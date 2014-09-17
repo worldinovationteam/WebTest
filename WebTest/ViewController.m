@@ -20,20 +20,20 @@
     
     screenSize=[[UIScreen mainScreen] bounds].size;
     
-    UITextField *textField = [[UITextField alloc]initWithFrame:CGRectMake((screenSize.width-100)/2, 100, 100, 40)];
+    UITextField *textField = [[UITextField alloc]initWithFrame:CGRectMake((screenSize.width-300)/2, 100, 300, 40)];
     textField.delegate = self;
     textField.borderStyle=UITextBorderStyleBezel;
     [self.view addSubview:textField];
     
     label=[[UILabel alloc]init];
     label.textAlignment=NSTextAlignmentCenter;
-    label.frame=CGRectMake((screenSize.width-150)/2, 150, 150, 40);
+    label.frame=CGRectMake((screenSize.width-300)/2, 150, 300, 40);
     label.text=@"相手探索中";
     [self.view addSubview:label];
     
     isTalking=[[UILabel alloc]init];
     isTalking.textAlignment=NSTextAlignmentCenter;
-    isTalking.frame=CGRectMake((screenSize.width-150)/2, 250, 150, 40);
+    isTalking.frame=CGRectMake((screenSize.width-300)/2, 250, 300, 40);
     isTalking.text=@"通話していません";
     [self.view addSubview:isTalking];
     
@@ -61,11 +61,27 @@
     connector=[[P2PConnector alloc]init];
     [connector initServerSocketWithAddr:@"153.121.70.32" AndPort:5000];
     [connector initClientSocketWithPort:6000];
-    if( [connector findPartner]==NO ){
-        return;
+    
+    //俺はこれを設定する
+    [connector setID:@"NoridukiVeryHappy"];
+    //君はこれを設定してくれ
+    //[connector setID:@"SaitoReallyLucky"];
+    
+    for(int i=0; i<3; i++ ){
+        if( [connector findPartner]==NO ){
+            if( i==2 ){
+                [label setText:@"だめでした。やり直してください"];
+                return;
+            }else{
+                continue;
+            }
+        }else{
+            break;
+        }
     }
     
-    if( [connector createP2PSocket]==NO ){
+    if( [connector prepareP2PConnection]==NO ){
+        label.text = @"パートナーとの接続に失敗しました";
         return;
     }
     
@@ -89,10 +105,6 @@
 -(IBAction)reloadText:(id)sender{
     if(connector.receiveBuf!=nil){
         label.text=connector.receiveBuf;
-    }else if(connector.flg==1||connector.flg==2){
-        label.text=@"P2P通信開始！";
-    }else{
-        label.text=@"相手探索中";
     }
     
     if( connector.isTalking ){
@@ -100,8 +112,8 @@
     }else{
         isTalking.text=@"通話していません";
     }
-    
 }
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [self.view endEditing:YES];
