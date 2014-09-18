@@ -12,8 +12,9 @@
 //4. findPartner で通信相手探索（このときスレッドの処理は相手が見つかるまで停止）見つかったらpartAddrに値が書き込まれ、flgが1か2になる
 //5. prepareP2PConnection でP2P通信用の準備をする
 //6. waitForPartner で相手からのパケットを待つ。受信したものがメッセージだったらreceiveBufに格納(最大サイズP2PBUF)
-//7. startSendingVoice で音声の送受信を開始。(isTalkingがYESになる)
-//8. sendPartnerMessage: で相手にメッセージを送る。
+//7. sendPartnerMessage: で相手にメッセージを送る。
+//7. call で相手にコールのパケットを送る。
+//8. startSendingVoice で音声の送受信を開始。(isTalkingがYESになる)
 //9. hangUp で音声通話を切る。(isTalkingがNOになる。相手が切ってもNOになる)
 //10. 通信が終わったらcloseP2PSocketをする。
 
@@ -36,6 +37,8 @@
     int       P2PSocket;
     int       flg;
     NSString* receiveBuf;
+    BOOL isCalling;
+    BOOL isCalled;
     BOOL isTalking;
     NSString* ID;
 }

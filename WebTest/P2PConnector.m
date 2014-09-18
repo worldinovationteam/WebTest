@@ -196,16 +196,13 @@ AudioQueueRef inQueue,outQueue;
         FD_SET(P2PSocket, &readfds);
         
         int n=select(P2PSocket+1, &readfds, NULL, NULL, &timeout);
+        
         if( n<0 ){
             NSLog(@"failed to select sockets");
             close(P2PSocket);
             return NO;
-        }else if( n==0 ){
-            NSLog(@"retrying to make P2P connection...");
-            continue;
-        }
-        
-        if( FD_ISSET(P2PSocket, &readfds) ){
+            
+        } else if( FD_ISSET(P2PSocket, &readfds) ){
             if( recvfrom(P2PSocket, receivedData, P2PBUF, 0,
                          (struct sockaddr *)&partAddr, &addrlen)<0 ){
                 NSLog(@"failed to receive from partner");
@@ -213,9 +210,11 @@ AudioQueueRef inQueue,outQueue;
                 return NO;
             }else if( receivedData[0]=='#' && receivedData[1]=='t' && receivedData[2]=='s' && receivedData[3]=='2' && receivedData[4]=='#' ){
                 return YES;
-            }else{
-                continue;
             }
+            
+        } else {
+        NSLog(@"retrying to make P2P connection...");
+            
         }
     }
     return NO;
@@ -238,20 +237,13 @@ AudioQueueRef inQueue,outQueue;
         FD_SET(P2PSocket, &readfds);
         
         int n=select(P2PSocket+1, &readfds, NULL, NULL, &timeout);
+        
         if( n<0 ){
             NSLog(@"failed to select sockets");
             close(P2PSocket);
             return NO;
-        }else if( n==0 ){
-            NSLog(@"retrying to make P2P connection...");
-            if(sendto(P2PSocket, msg1, strlen(msg1)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
-                NSLog(@"failed to send a dummy message");
-                return NO;
-            }
-            continue;
-        }
-        
-        if( FD_ISSET(P2PSocket, &readfds) ){
+            
+        } else if( FD_ISSET(P2PSocket, &readfds) ){
             if( recvfrom(P2PSocket, receivedData, P2PBUF, 0,
                          (struct sockaddr *)&partAddr, &addrlen)<0 ){
                 NSLog(@"failed to receive from partner");
@@ -269,9 +261,18 @@ AudioQueueRef inQueue,outQueue;
                     return NO;
                 }
             }
+            
+        } else {
+            NSLog(@"retrying to make P2P connection...");
+            if(sendto(P2PSocket, msg1, strlen(msg1)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
+                NSLog(@"failed to send a dummy message");
+                return NO;
+            }
+            
         }
+        
     }
-    return YES;
+    return NO;
 }
 
 -(BOOL)closeP2PSocket{

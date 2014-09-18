@@ -63,9 +63,9 @@
     [connector initClientSocketWithPort:6000];
     
     //俺はこれを設定する
-    [connector setID:@"NoridukiVeryHappy"];
+    //[connector setID:@"NoridukiVeryHappy"];
     //君はこれを設定してくれ
-    //[connector setID:@"SaitoReallyLucky"];
+    [connector setID:@"SaitoReallyLucky"];
     
     for(int i=0; i<3; i++ ){
         if( [connector findPartner]==NO ){
