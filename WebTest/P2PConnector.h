@@ -12,9 +12,9 @@
 //4. findPartner で通信相手探索（このときスレッドの処理は相手が見つかるまで停止）見つかったらpartAddrに値が書き込まれ、flgが1か2になる
 //5. prepareP2PConnection でP2P通信用の準備をする
 //6. waitForPartner で相手からのパケットを待つ。受信したものがメッセージだったらreceiveBufに格納(最大サイズP2PBUF)
-//7. startSendingVoice で音声の送受信を開始。(talkingがYESになる)
+//7. startSendingVoice で音声の送受信を開始。(isTalkingがYESになる)
 //8. sendPartnerMessage: で相手にメッセージを送る。
-//9. hangUp で音声通話を切る。(talkingがNOになる。相手が切ってもNOになる)
+//9. hangUp で音声通話を切る。(isTalkingがNOになる。相手が切ってもNOになる)
 //10. 通信が終わったらcloseP2PSocketをする。
 
 #import <Foundation/Foundation.h>
@@ -26,8 +26,8 @@
 
 #define SERVBUF 128
 #define P2PBUF 340
-#define TIMEOUT 3 //マッチングタイムアウトの秒数。(サーバー側は10秒でタイムアウトする)
-#define CALLOUT 3 //コールのタイムアウトの秒数。
+#define TIMEOUT 12 //マッチングタイムアウトの秒数。(サーバー側は10秒でタイムアウトする)
+#define CALLOUT 12 //コールのタイムアウトの秒数。
 
 @interface P2PConnector : NSObject{
     struct sockaddr_in cliAddr;

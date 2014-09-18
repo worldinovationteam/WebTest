@@ -81,7 +81,7 @@ AudioQueueRef inQueue,outQueue;
     FD_ZERO(&readfds);
     FD_SET(sockfd, &readfds);
     
-    int n=select(0, &readfds, NULL, NULL, &timeout);
+    int n=select(sockfd+1, &readfds, NULL, NULL, &timeout);
     if( n<0 ){
         NSLog(@"failed to select sockets");
         close(sockfd);
@@ -195,7 +195,7 @@ AudioQueueRef inQueue,outQueue;
         FD_ZERO(&readfds);
         FD_SET(P2PSocket, &readfds);
         
-        int n=select(0, &readfds, NULL, NULL, &timeout);
+        int n=select(P2PSocket+1, &readfds, NULL, NULL, &timeout);
         if( n<0 ){
             NSLog(@"failed to select sockets");
             close(P2PSocket);
@@ -237,7 +237,7 @@ AudioQueueRef inQueue,outQueue;
         FD_ZERO(&readfds);
         FD_SET(P2PSocket, &readfds);
         
-        int n=select(0, &readfds, NULL, NULL, &timeout);
+        int n=select(P2PSocket+1, &readfds, NULL, NULL, &timeout);
         if( n<0 ){
             NSLog(@"failed to select sockets");
             close(P2PSocket);
