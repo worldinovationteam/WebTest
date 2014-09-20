@@ -10,29 +10,29 @@
 	<string>WebTest</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>4E81D007-AD3C-4D0F-AD29-5A9654057943</key>
+		<key>68AB5D8D9A9490B27DFBB62C6F3D59B16F14C7D0</key>
 		<string>https://github.com/worldinovationteam/WebTest.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>WebTest.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>4E81D007-AD3C-4D0F-AD29-5A9654057943</key>
+		<key>68AB5D8D9A9490B27DFBB62C6F3D59B16F14C7D0</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/worldinovationteam/WebTest.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>4E81D007-AD3C-4D0F-AD29-5A9654057943</string>
+	<string>68AB5D8D9A9490B27DFBB62C6F3D59B16F14C7D0</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>4E81D007-AD3C-4D0F-AD29-5A9654057943</string>
+			<string>68AB5D8D9A9490B27DFBB62C6F3D59B16F14C7D0</string>
 			<key>IDESourceControlWCCName</key>
 			<string>WebTest</string>
 		</dict>

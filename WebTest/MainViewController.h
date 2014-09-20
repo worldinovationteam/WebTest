@@ -1,8 +1,8 @@
 //
-//  ViewController.h
+//  MainViewController.h
 //  WebTest
 //
-//  Created by nariyuki on 7/4/14.
+//  Created by nariyuki on 9/19/14.
 //  Copyright (c) 2014 Nariyuki Saito. All rights reserved.
 //
 
@@ -11,7 +11,7 @@
 #import "XMLDelegate.h"
 #import "P2PConnector.h"
 
-@interface ViewController : UIViewController<UITextFieldDelegate>{
+@interface MainViewController : UIViewController<UITextFieldDelegate, UIAlertViewDelegate, P2PConnectorDelegate>{
     P2PConnector* connector;
     UILabel* label;
     UILabel* isTalking;
@@ -19,5 +19,7 @@
     UIButton* hangUp;
     CGSize screenSize;
 }
+
+@property P2PConnector* connector;
 
 @end

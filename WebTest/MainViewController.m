@@ -1,22 +1,24 @@
 //
-//  ViewController.m
+//  MainViewController.m
 //  WebTest
 //
-//  Created by nariyuki on 7/4/14.
+//  Created by nariyuki on 9/19/14.
 //  Copyright (c) 2014 Nariyuki Saito. All rights reserved.
 //
 
-#import "ViewController.h"
-#import "TimeDataHandler.h"
-#import "XMLDelegate.h"
-#import "P2PConnector.h"
-#import "AudioHandler.h"
+#import "MainViewController.h"
+#import "AppDelegate.h"
 
-@implementation ViewController
+@implementation MainViewController
+
+@synthesize connector;
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    AppDelegate *appdelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [appdelegate setViewController:self];
     
     screenSize=[[UIScreen mainScreen] bounds].size;
     
@@ -38,38 +40,30 @@
     [self.view addSubview:isTalking];
     
     call=[UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [call setTitle:@"通話開始" forState:UIControlStateNormal];
+    [call setTitle:@"発信" forState:UIControlStateNormal];
     [call addTarget:self action:@selector(startCalling:) forControlEvents:UIControlEventTouchUpInside];
-    [call setFrame:CGRectMake((screenSize.width-200)/2, 300, 200, 100)];
+    [call setFrame:CGRectMake((screenSize.width-200)/2-100, 300, 200, 100)];
+    [self.view addSubview:call];
     
     hangUp=[UIButton buttonWithType:UIButtonTypeRoundedRect];
     [hangUp setTitle:@"通話切断" forState:UIControlStateNormal];
     [hangUp addTarget:self action:@selector(stopCalling:) forControlEvents:UIControlEventTouchUpInside];
-    [hangUp setFrame:CGRectMake((screenSize.width-200)/2, 300, 200, 100)];
+    [hangUp setFrame:CGRectMake((screenSize.width-200)/2+100, 300, 200, 100)];
+    [self.view addSubview:hangUp];
     
     [NSThread detachNewThreadSelector:@selector(connect) toTarget:self withObject:nil];
-    NSTimer* timer = [NSTimer scheduledTimerWithTimeInterval:0.5f
-                                                      target:self
-                                                    selector:@selector(reloadText:)
-                                                    userInfo:nil
-                                                     repeats:YES];
-    [timer fire];
-
 }
 
 -(void)connect{
-    connector=[[P2PConnector alloc]init];
-    [connector initServerSocketWithAddr:@"153.121.70.32" AndPort:5000];
-    [connector initClientSocketWithPort:6000];
+    connector=[[P2PConnector alloc]initWithServerAddr:@"153.121.70.32"
+                                           serverPort:5000
+                                           clientPort:6000
+                                             delegate:self
+                                                   ID:@"aaaa"/*@"iiii"*/];
     
-    //俺はこれを設定する
-    //[connector setID:@"NoridukiVeryHappy"];
-    //君はこれを設定してくれ
-    [connector setID:@"SaitoReallyLucky"];
-    
-    for(int i=0; i<3; i++ ){
+    for(int i=0; i<5; i++ ){
         if( [connector findPartner]==NO ){
-            if( i==2 ){
+            if( i==4 ){
                 [label setText:@"だめでした。やり直してください"];
                 return;
             }else{
@@ -85,33 +79,46 @@
         return;
     }
     
-    [NSThread detachNewThreadSelector:@selector(waitForPartner) toTarget:connector withObject:nil];
+    [connector startWaitingForPartner];
     [connector sendPartnerMessage:@"P2P通信開始！"];
-    [self.view addSubview:call];
 }
 
 -(IBAction)startCalling:(id)sender{
-    [connector startSendingVoice];
-    [call removeFromSuperview];
-    [self.view addSubview:hangUp];
+    if( [connector call]==YES ){
+        isTalking.text=@"呼び出し中...";
+    }
 }
 
 -(IBAction)stopCalling:(id)sender{
-    [connector hangUp];
-    [hangUp removeFromSuperview];
-    [self.view addSubview:call];
-}
-
--(IBAction)reloadText:(id)sender{
-    if(connector.receiveBuf!=nil){
-        label.text=connector.receiveBuf;
-    }
-    
-    if( connector.isTalking ){
-        isTalking.text=@"通話中";
-    }else{
+    if( [connector hangUp]==YES ){
         isTalking.text=@"通話していません";
     }
+}
+
+-(void)didReceiveMessage:(NSString *)message{
+    label.text=message;
+}
+
+-(void)didReceiveHangUp{
+    isTalking.text=@"相手が通話切断しました";
+}
+
+-(void)didReceiveCall{
+    UIAlertView *alert = [[UIAlertView alloc] init];
+    alert.delegate = self;
+    alert.title = nil;
+    alert.message = @"音声通話着信";
+    [alert addButtonWithTitle:@"応答"];
+    [alert addButtonWithTitle:@"拒否"];
+    [alert show];
+}
+
+-(void)didReceiveResponse{
+    isTalking.text=@"通話中";
+}
+
+-(void)didReceiveDisconnection{
+    isTalking.text=@"相手との通信が切断されました";
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -126,6 +133,20 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)alertView:(UIAlertView*)alertView
+clickedButtonAtIndex:(NSInteger)buttonIndex {
+    
+    switch (buttonIndex) {
+        case 0:
+            [connector respond];
+            isTalking.text=@"通話中";
+            break;
+        case 1:
+            [connector hangUp];
+            break;
+    }
 }
 
 @end

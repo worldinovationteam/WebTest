@@ -6,17 +6,21 @@
 //  Copyright (c) 2014 Nariyuki Saito. All rights reserved.
 //
 //<使い方>
-//1. initServerSocketWithAddr:AndPort: でまずマッチングサーバーのIPアドレスとポート番号を指定
-//2. initClientSocketWithPort:　で自分のiPhoneの通信用ポート番号を指定
-//3. setID: で自分のIDナンバーを設定
-//4. findPartner で通信相手探索（このときスレッドの処理は相手が見つかるまで停止）見つかったらpartAddrに値が書き込まれ、flgが1か2になる
-//5. prepareP2PConnection でP2P通信用の準備をする
-//6. waitForPartner で相手からのパケットを待つ。受信したものがメッセージだったらreceiveBufに格納(最大サイズP2PBUF)
-//7. sendPartnerMessage: で相手にメッセージを送る。
-//7. call で相手にコールのパケットを送る。
-//8. startSendingVoice で音声の送受信を開始。(isTalkingがYESになる)
-//9. hangUp で音声通話を切る。(isTalkingがNOになる。相手が切ってもNOになる)
-//10. 通信が終わったらcloseP2PSocketをする。
+//1. イニシャライザで必要なパラメータ(マッチングサーバのアドレスとポート、自分のポート、P2P通信の受信時に通知するデリゲート、自分のID)を設定する。
+//   デリゲートには必ずP2PConnectorDelegateプロトコルを採用する。
+//2. findPartner で通信相手探索（このときスレッドの処理は相手が見つかるまで停止）見つかったらpartAddrに値が書き込まれ、flgが1か2になる
+//3. prepareP2PConnection でP2P通信用の準備をする。成功するとisConnectedがYESになる。
+//4. startWaitingForPartner で相手からのパケットの受信を開始する。
+//   受信したものが#msg#から始まるメッセージだったらデリゲートのdidReceiveMessage:が呼ばれてメッセージが渡される(最大サイズP2PBUF)
+//   受信したものが#hup#だったらisTalking, isCalling, isCalledをすべてNOにする。さらに通話中の場合は音声送受信を停止(切断通知)。デリゲートのdidReceiveHangUpが呼ばれる
+//   受信したものが#cal#だったら, isTalking=isCalling=isCalled=NOの場合に限りisCalledをYESにする(着信)。デリゲートのdidReceiveCallが呼ばれる
+//   受信したものが#cok#だったら, isCalling=YES, isCalled=isTalking=NOの場合に限り, 音声通話を開始、isTalkingをYES, isCallingをNOにする(通話承諾)。デリゲートのdidReceiveResponseが呼ばれる
+//   受信したものが#dis#だったら、 isCalling, isTalking, isCalled, isConnectedをすべてNOにし、P2PSocketをcloseする。デリゲートのdidReceiveDisconnectionが呼ばれる
+//5. sendPartnerMessage: で相手にメッセージを送る。
+//5. call でisCalling=isTalking=isCalled=NOの場合に限り、相手に#cal#を送り、通話を発信する。isCallingをYESにする。
+//5. respond でisCalled=YES, isCalling=isTalking=NOの場合に限り、相手に#cok#を送り、音声通話を開始、isTalkingをYES, isCalledをNOにする。
+//5. hangUp で音声送受信を停止/着信拒否/発信中止。isTalking, isCalling, isCalledがNOになる。相手に#hup#を送る。
+//6. 通信が終わったらcloseP2PSocketをする。相手に#dis#を送り、通信切断を通知。この後はパケットの受信が停止し、送信もできなくなる。
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
@@ -25,41 +29,53 @@
 #import <netinet/in.h>
 #import <arpa/inet.h>
 
-#define SERVBUF 128
-#define P2PBUF 340
-#define TIMEOUT 12 //マッチングタイムアウトの秒数。(サーバー側は10秒でタイムアウトする)
-#define CALLOUT 12 //コールのタイムアウトの秒数。
+@protocol P2PConnectorDelegate;
 
 @interface P2PConnector : NSObject{
+    id <P2PConnectorDelegate> delegate;
     struct sockaddr_in cliAddr;
     struct sockaddr_in servAddr;
     struct sockaddr_in partAddr;
-    int       P2PSocket;
-    int       flg;
-    NSString* receiveBuf;
+    int  P2PSocket;
+    int  flg;
+    BOOL isConnected;
     BOOL isCalling;
     BOOL isCalled;
     BOOL isTalking;
     NSString* ID;
 }
 
+@property id <P2PConnectorDelegate> delegate;
 @property struct sockaddr_in cliAddr;
 @property struct sockaddr_in servAddr;
 @property struct sockaddr_in partAddr;
-@property int       P2PSocket;
-@property int       flg;
-@property NSString* receiveBuf;
-@property BOOL isTalking;
+@property (readonly) int  P2PSocket;
+@property (readonly) int  flg;
+@property (readonly) BOOL isConnected;
+@property (readonly) BOOL isCalling;
+@property (readonly) BOOL isCalled;
+@property (readonly) BOOL isTalking;
 @property NSString* ID;
 
--(void)initServerSocketWithAddr:(NSString*)addr AndPort:(int)port;
--(void)initClientSocketWithPort:(int)port;
+-(id)initWithServerAddr:(NSString*)addr serverPort:(int)sport clientPort:(int)cport delegate:(id <P2PConnectorDelegate>)object ID:(NSString*)idstr;
 -(BOOL)findPartner;
 -(BOOL)sendPartnerMessage:(NSString*)message;
--(BOOL)startSendingVoice;
+-(BOOL)call;
+-(BOOL)respond;
 -(BOOL)hangUp;
 -(BOOL)prepareP2PConnection;
 -(BOOL)closeP2PSocket;
--(BOOL)waitForPartner;
+-(BOOL)startWaitingForPartner;
+
+@end
+
+@protocol P2PConnectorDelegate <NSObject>
+
+@required
+-(void)didReceiveMessage:(NSString*)message;
+-(void)didReceiveHangUp;
+-(void)didReceiveCall;
+-(void)didReceiveResponse;
+-(void)didReceiveDisconnection;
 
 @end
