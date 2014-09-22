@@ -59,11 +59,11 @@
                                            serverPort:5000
                                            clientPort:6000
                                              delegate:self
-                                                   ID:@"aaaa"/*@"iiii"*/];
+                                                   ID:@"iiii"];
     
-    for(int i=0; i<5; i++ ){
+    for(int i=0; i<100; i++ ){
         if( [connector findPartner]==NO ){
-            if( i==4 ){
+            if( i==99 ){
                 [label setText:@"だめでした。やり直してください"];
                 return;
             }else{
@@ -129,12 +129,6 @@
     return YES;
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 -(void)alertView:(UIAlertView*)alertView
 clickedButtonAtIndex:(NSInteger)buttonIndex {
     
@@ -147,6 +141,12 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
             [connector hangUp];
             break;
     }
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
 }
 
 @end

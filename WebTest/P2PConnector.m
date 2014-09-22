@@ -188,7 +188,7 @@ AudioQueueRef inQueue,outQueue;
     //flg==1のときは相手に#ts1#をおくり、相手から応答の#ts2#がきたら終了
     //flg==2のときは相手からの#ts1#を待ち、こないときは#ts1#を送る。もし来たら応答の#ts2#を送って終了
     
-    
+    /*
     if( flg==1 ){
         if( [self confirmP2PConnectFlg1]==NO ){
             NSLog(@"failed to make P2P connection, flg=1");
@@ -200,6 +200,7 @@ AudioQueueRef inQueue,outQueue;
             return NO;
         }
     }
+    */
     isConnected=YES;
     
     //P2P通信の確保のため、#tst#をINTERVAL秒ごとに送る。
@@ -216,8 +217,8 @@ AudioQueueRef inQueue,outQueue;
 -(BOOL)confirmP2PConnectFlg1{
     
     struct timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500000; //0.5秒でタイムアウト
+    timeout.tv_sec = 5000;
+    timeout.tv_usec = 0; //0.5秒でタイムアウト
     
     fd_set readfds;
     struct sockaddr_in tmpAddr;
@@ -271,8 +272,8 @@ AudioQueueRef inQueue,outQueue;
 -(BOOL)confirmP2PConnectFlg2{
     
     struct timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500000; //0.5秒でタイムアウト
+    timeout.tv_sec = 5000;
+    timeout.tv_usec = 0; //0.5秒でタイムアウト
     
     fd_set readfds;
     struct sockaddr_in tmpAddr;
