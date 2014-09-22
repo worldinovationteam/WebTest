@@ -55,12 +55,12 @@
 }
 
 -(void)connect{
+    [NSThread sleepForTimeInterval:1.0f];
     connector=[[P2PConnector alloc]initWithServerAddr:@"153.121.70.32"
                                            serverPort:5000
                                            clientPort:6000
                                              delegate:self
-                                                   ID:@"iiii"];
-    
+                                                   ID:@"aaaa"];
     for(int i=0; i<100; i++ ){
         if( [connector findPartner]==NO ){
             if( i==99 ){
@@ -81,6 +81,7 @@
     
     [connector startWaitingForPartner];
     [connector sendPartnerMessage:@"P2P通信開始！"];
+    
 }
 
 -(IBAction)startCalling:(id)sender{
@@ -97,10 +98,12 @@
 
 -(void)didReceiveMessage:(NSString *)message{
     label.text=message;
+    NSLog(@"received message: %@",message);
 }
 
 -(void)didReceiveHangUp{
     isTalking.text=@"相手が通話切断しました";
+    NSLog(@"partner has hung up");
 }
 
 -(void)didReceiveCall{
@@ -111,14 +114,17 @@
     [alert addButtonWithTitle:@"応答"];
     [alert addButtonWithTitle:@"拒否"];
     [alert show];
+    NSLog(@"received call");
 }
 
 -(void)didReceiveResponse{
     isTalking.text=@"通話中";
+    NSLog(@"partner has responded to call");
 }
 
 -(void)didReceiveDisconnection{
     isTalking.text=@"相手との通信が切断されました";
+    NSLog(@"partner has disconnected");
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField

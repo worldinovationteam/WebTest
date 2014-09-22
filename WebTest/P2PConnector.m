@@ -217,10 +217,9 @@ AudioQueueRef inQueue,outQueue;
 -(BOOL)confirmP2PConnectFlg1{
     
     struct timeval timeout;
-    timeout.tv_sec = 5000;
+    timeout.tv_sec = 1;
     timeout.tv_usec = 0; //0.5秒でタイムアウト
     
-    fd_set readfds;
     struct sockaddr_in tmpAddr;
     bzero((char*)&tmpAddr, sizeof(tmpAddr));
     socklen_t addrlen = sizeof(tmpAddr);
@@ -234,6 +233,7 @@ AudioQueueRef inQueue,outQueue;
             return NO;
         }
         
+        fd_set readfds;
         FD_ZERO(&readfds);
         FD_SET(P2PSocket, &readfds);
         
@@ -272,10 +272,9 @@ AudioQueueRef inQueue,outQueue;
 -(BOOL)confirmP2PConnectFlg2{
     
     struct timeval timeout;
-    timeout.tv_sec = 5000;
+    timeout.tv_sec = 1;
     timeout.tv_usec = 0; //0.5秒でタイムアウト
     
-    fd_set readfds;
     struct sockaddr_in tmpAddr;
     bzero((char*)&tmpAddr, sizeof(tmpAddr));
     socklen_t addrlen = sizeof(tmpAddr);
@@ -285,6 +284,12 @@ AudioQueueRef inQueue,outQueue;
     
     for( int i=0; i<10; i++ ){
         
+        if(sendto(P2PSocket, msg1, strlen(msg1)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
+            NSLog(@"failed to send a dummy message");
+            return NO;
+        }
+        
+        fd_set readfds;
         FD_ZERO(&readfds);
         FD_SET(P2PSocket, &readfds);
         
@@ -308,18 +313,13 @@ AudioQueueRef inQueue,outQueue;
                     NSLog(@"failed to send a dummy message");
                     return NO;
                 }
-                NSLog(@"received msg1 from partner");
+                NSLog(@"received msg1 from partner, and responded");
                 return YES;
             }
             
         }
         
         NSLog(@"retrying to make P2P connection...");
-        if(sendto(P2PSocket, msg1, strlen(msg1)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
-            NSLog(@"failed to send a dummy message");
-            return NO;
-        }
-        
     }
     return NO;
 }
@@ -365,6 +365,7 @@ AudioQueueRef inQueue,outQueue;
     }
     
     [NSThread detachNewThreadSelector:@selector(waitForPartner) toTarget:self withObject:nil];
+    
     return YES;
 }
 
@@ -394,8 +395,7 @@ AudioQueueRef inQueue,outQueue;
         //メッセージの場合
         if( receivedData[0]=='#' && receivedData[1]=='m' && receivedData[2]=='s' && receivedData[3]=='g' && receivedData[4]=='#' ){
             NSString* receiveBuf = [[NSString stringWithUTF8String:receivedData] substringFromIndex:5];
-            [delegate didReceiveMessage:receiveBuf];
-            NSLog(@"received message: %@",receiveBuf);
+            [NSThread detachNewThreadSelector:@selector(didReceiveMessage:) toTarget:delegate withObject:receiveBuf];
             
         //切断通知の場合
         }else if( receivedData[0]=='#' && receivedData[1]=='h' && receivedData[2]=='u' && receivedData[3]=='p' && receivedData[4]=='#' ){
@@ -413,8 +413,7 @@ AudioQueueRef inQueue,outQueue;
             isTalking=NO;
             isCalling=NO;
             isCalled=NO;
-            [delegate didReceiveHangUp];
-            NSLog(@"partner has hung up");
+            [NSThread detachNewThreadSelector:@selector(didReceiveHangUp) toTarget:delegate withObject:nil];
             
         //着信の場合
         }else if( receivedData[0]=='#' && receivedData[1]=='c' && receivedData[2]=='a' && receivedData[3]=='l' && receivedData[4]=='#' ){
@@ -423,8 +422,7 @@ AudioQueueRef inQueue,outQueue;
                 continue;
             }
             isCalled=YES;
-            [delegate didReceiveCall];
-            NSLog(@"received call");
+            [NSThread detachNewThreadSelector:@selector(didReceiveCall) toTarget:delegate withObject:nil];
         
         //通話承諾通知の場合
         }else if( receivedData[0]=='#' && receivedData[1]=='c' && receivedData[2]=='o' && receivedData[3]=='k' && receivedData[4]=='#' ){
@@ -435,8 +433,7 @@ AudioQueueRef inQueue,outQueue;
             isCalling=NO;
             isTalking=YES;
             [self startSendingVoice];
-            [delegate didReceiveResponse];
-            NSLog(@"partner has responded to call");
+            [NSThread detachNewThreadSelector:@selector(didReceiveResponse) toTarget:delegate withObject:nil];
             
         //通信切断通知の場合
         }else if( receivedData[0]=='#' && receivedData[1]=='d' && receivedData[2]=='i' && receivedData[3]=='s' && receivedData[4]=='#' ){
@@ -452,8 +449,7 @@ AudioQueueRef inQueue,outQueue;
             isCalling=NO;
             isCalled=NO;
             close(P2PSocket);
-            [delegate didReceiveDisconnection];
-            NSLog(@"partner has disconnected");
+            [NSThread detachNewThreadSelector:@selector(didReceiveDisconnection) toTarget:delegate withObject:nil];
         
         //P2P通信確保用のテストパケットの場合
         }else if( receivedData[0]=='#' && receivedData[1]=='t' && receivedData[2]=='s' && receivedData[3]=='t' && receivedData[4]=='#' ){
