@@ -13,13 +13,16 @@
 #import <netinet/in.h>
 #import <arpa/inet.h>
 
-#define PPBUF 680
+#define PPBUF 1024
+#define PBUF 4096
 #define NUMBUF 3
 
-int data[PPBUF];
+char data[PPBUF/2];
 
 @interface AudioHandler : NSObject{
 }
 
 -(BOOL)startSendingVoice;
+-(BOOL)startReceivingVoice;
+
 @end
