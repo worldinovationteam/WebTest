@@ -21,6 +21,8 @@
 //5. respond でisCalled=YES, isCalling=isTalking=NOの場合に限り、相手に#cok#を送り、音声通話を開始、isTalkingをYES, isCalledをNOにする。
 //5. hangUp で音声送受信を停止/着信拒否/発信中止。isTalking, isCalling, isCalledがNOになる。相手に#hup#を送る。
 //6. 通信が終わったらcloseP2PSocketをする。相手に#dis#を送り、通信切断を通知。この後はパケットの受信が停止し、送信もできなくなる。
+//
+//*音声通信にはIMA/ADPCMで圧縮した64 kbit/sの信号を用いる。サンプリング周波数16000 Hz, フレーム長64 ms.
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>

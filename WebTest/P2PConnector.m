@@ -495,7 +495,7 @@ AudioQueueRef inQueue,outQueue;
     //output Linear PCM 16000 Hz
     outDataFormat.mSampleRate = 16000.0f;
     outDataFormat.mFormatID = kAudioFormatLinearPCM;
-    outDataFormat.mFormatFlags = kLinearPCMFormatFlagIsBigEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+    outDataFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
     outDataFormat.mBytesPerPacket = 2;
     outDataFormat.mFramesPerPacket = 1;
     outDataFormat.mBytesPerFrame = 2;
@@ -506,7 +506,7 @@ AudioQueueRef inQueue,outQueue;
     //input Linear PCM 64000 Hz (使うのは16000 Hzだけ)
     inDataFormat.mSampleRate = 64000.0f;
     inDataFormat.mFormatID = kAudioFormatLinearPCM;
-    inDataFormat.mFormatFlags = kLinearPCMFormatFlagIsBigEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+    inDataFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
     inDataFormat.mBytesPerPacket = 2;
     inDataFormat.mFramesPerPacket = 1;
     inDataFormat.mBytesPerFrame = 2;
@@ -653,8 +653,6 @@ void AudioInputCallback(
             index = 88;
         stepsize = stepsizeTable[index]; /* find new quantizer stepsize */
         
-        if( j>1015 || j<2 )NSLog(@"j = %d, index = %d, orgdata = %d ",j,index,datapt[j]);
-        if( j==1023 )NSLog(@" ");
     }
     
     sendto(exP2PSocket, data, P2PBUF, 0, (struct sockaddr*)&expartAddr, sizeof(expartAddr));

@@ -51,6 +51,10 @@
     [hangUp setFrame:CGRectMake((screenSize.width-200)/2+100, 300, 200, 100)];
     [self.view addSubview:hangUp];
     
+    /*AudioHandler* hand=[[AudioHandler alloc]init];
+    [hand startReceivingVoice];
+    [hand startSendingVoice];*/
+    
     [NSThread detachNewThreadSelector:@selector(connect) toTarget:self withObject:nil];
 }
 

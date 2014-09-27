@@ -10,7 +10,7 @@
 
 @implementation AudioHandler
 
-int stepsizeTable[89] = {7, 8, 9, 10, 11, 12, 13, 14,
+int stepsizeTble[89] = {7, 8, 9, 10, 11, 12, 13, 14,
     16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60,
     66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209,
     230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658,
@@ -20,7 +20,7 @@ int stepsizeTable[89] = {7, 8, 9, 10, 11, 12, 13, 14,
     13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794,
     32767};
 
-int stepsizetable[89] = {7, 8, 9, 10, 11, 12, 13, 14,
+int stepsizetble[89] = {7, 8, 9, 10, 11, 12, 13, 14,
     16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60,
     66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209,
     230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658,
@@ -30,9 +30,11 @@ int stepsizetable[89] = {7, 8, 9, 10, 11, 12, 13, 14,
     13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794,
     32767};
 
-int indexTable[16] = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
+int indexTble[16] = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
 
-int indextable[16] = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
+int indextble[16] = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
+
+int16_t tmpdata[PPBUF];
 
 void AudioInputtCallback(
                                 void* inUserData,
@@ -42,14 +44,14 @@ void AudioInputtCallback(
                                 UInt32 inNumberPacketDescriptions,
                                 const AudioStreamPacketDescription *inPacketDescs){
 
-    int16_t tmpdata[PPBUF];
+    //int16_t tmpdata[PPBUF];
     int16_t *datapt=(int16_t *)inBuffer->mAudioData;
     
     int predictedSample = 0;
     int index = 0;
     unsigned int stepsize = 7;
     int difference, tempStepsize;
-    unsigned char newSample;
+    unsigned char newsample;
     int i;
 
     for(i=0; i<PPBUF; i++){
@@ -62,9 +64,9 @@ void AudioInputtCallback(
         //newSampleの符号を決定
         if (difference >= 0)
         {
-            newSample = 0b00000000;
+            newsample = 0b00000000;
         } else {
-            newSample = 0b00001000;
+            newsample = 0b00001000;
             difference = -difference;
         }
         
@@ -72,37 +74,37 @@ void AudioInputtCallback(
         tempStepsize = stepsize;
         
         if(difference>=tempStepsize){
-            newSample |= 0b00000100;
+            newsample |= 0b00000100;
             difference-=tempStepsize;
         }
         tempStepsize>>=1;
         if(difference>=tempStepsize){
-            newSample |= 0b00000010;
+            newsample |= 0b00000010;
             difference-=tempStepsize;
         }
         tempStepsize>>=1;
         if(difference>=tempStepsize){
-            newSample |= 0b00000001;
+            newsample |= 0b00000001;
         }
 
         /* 4-bit newSample can be stored at this point */
         if( j%2==1 ){
-            data[(j-1)/2] |= newSample;
+            data[(j-1)/2] |= newsample;
         }else{
-            data[j/2] = newSample<<4;
+            data[j/2] = newsample<<4;
         }
         
         /* compute new sample estimate predictedSample */
         difference = stepsize >> 3;; // calculate difference = (newSample + 1⁄2) * stepsize/4 if (newSample & 4) // perform multiplication through repetitive addition
-        if (newSample & 0b00000100)
+        if (newsample & 0b00000100)
             difference += stepsize;
-        if (newSample & 0b00000010)
+        if (newsample & 0b00000010)
             difference += stepsize >> 1;
-        if (newSample & 0b00000001)
+        if (newsample & 0b00000001)
             difference += stepsize >> 2;
 
         /* (newSample + 1⁄2) * stepsize/4 = newSample * stepsize/4 + stepsize/8 */
-        if (newSample & 0b00001000 ) /* account for sign bit */
+        if (newsample & 0b00001000 ) /* account for sign bit */
             difference = -difference;
         /* adjust predicted sample based on calculated difference: */
         predictedSample += difference;
@@ -113,16 +115,16 @@ void AudioInputtCallback(
         
         /* compute new stepsize */
         /* adjust index into stepsize lookup table using newSample */
-        int diffindex=indexTable[newSample];
+        int diffindex=indexTble[newsample];
         index += diffindex;
         if (index < 0) /* check for index underflow */
             index = 0;
         else if (index > 88) /* check for index overflow */
             index = 88;
-        stepsize = stepsizeTable[index]; /* find new quantizer stepsize */
+        stepsize = stepsizeTble[index]; /* find new quantizer stepsize */
         
-        if( j>1015 || j<2 )NSLog(@"j = %d, index = %d, orgdata = %d ",j,index,datapt[j]);
-        if( j==1023 )NSLog(@" ");
+        /*if( j>1015 )NSLog(@"j = %d, index = %d, orgdata = %d ",j,index,tmpdata[j]);
+        if( j==1023 )NSLog(@" ");*/
     }
     
     AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
@@ -133,23 +135,21 @@ void AudioOutputtCallback (
                                   AudioQueueRef        inAQ,
                                   AudioQueueBufferRef  inBuffer
                                   ){
-    inBuffer->mAudioDataByteSize=PPBUF;
+    inBuffer->mAudioDataByteSize=PPBUF*2;
     int16_t* datapt= (int16_t *)(inBuffer->mAudioData);
     
     int newSample=0;
     int index = 0;
     int stepsize = 7;
     int difference;
-    char originalSample,tmpdata;
+    char originalSample;
  
     for( int j=0; j<PPBUF; j++ ){
         
-        tmpdata=data[j/2];
-        
         if( j%2==1 ){
-            originalSample = tmpdata & 0b00001111;
+            originalSample = data[(j-1)/2] & 0b00001111;
         }else{
-            originalSample = tmpdata >> 4;
+            originalSample = data[j/2] >> 4;
         }
         
         difference = 0b00000000;
@@ -173,21 +173,25 @@ void AudioOutputtCallback (
             newSample = -32768;
         /* 16-bit newSample can be stored at this point */
         
+        
+        //datapt[j]=(int16_t)(j%300);
         datapt[j]=newSample;
+        //datapt[j]=(int16_t)tmpdata[j];
+        if( j>1020 )NSLog(@"rand = %d",datapt[j]);//NSLog(@"tmpdata= %d, newSample = %d, j= %d",tmpdata[j],newSample,j);
         
         /* compute new stepsize */
         /*adjust index into stepsize lookup table using originalSample: */
-        index += indextable[originalSample];
+        index += indextble[originalSample];
         if (index < 0){
             index = 0;
         }else if (index > 88){
             index = 88;
         }
         
-        stepsize = stepsizetable[index];
+        stepsize = stepsizetble[index];
         
-        if( j>1015 || j<2 )NSLog(@"j = %d, index = %d, outdata = %d ",j,index,datapt[j]);
-        if( j==1023 )NSLog(@" ");
+        /*if( j>1015 )NSLog(@"j = %d, index = %d, outdata = %d ",j,index,datapt[j]);
+        if( j==1023 )NSLog(@" ");*/
 
     }
     
@@ -205,7 +209,7 @@ void AudioOutputtCallback (
      // Linear PCM 16000 Hz
      dataFormat.mSampleRate = 16000.0f;
      dataFormat.mFormatID = kAudioFormatLinearPCM;
-     dataFormat.mFormatFlags = kLinearPCMFormatFlagIsBigEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+     dataFormat.mFormatFlags =  kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
      dataFormat.mBytesPerPacket = 2;
      dataFormat.mFramesPerPacket = 1;
      dataFormat.mBytesPerFrame = 2;
@@ -277,7 +281,7 @@ void AudioOutputtCallback (
      // Linear PCM 44100 Hz
      dataFormat.mSampleRate = 64000.0f;
      dataFormat.mFormatID = kAudioFormatLinearPCM;
-     dataFormat.mFormatFlags = kLinearPCMFormatFlagIsBigEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+     dataFormat.mFormatFlags =  kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
      dataFormat.mBytesPerPacket = 2;
      dataFormat.mFramesPerPacket = 1;
      dataFormat.mBytesPerFrame = 2;

@@ -24,6 +24,7 @@
 		26426BD519758E5900DB7EA5 /* P2PConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = 26426BD419758E5900DB7EA5 /* P2PConnector.m */; };
 		2643D4FB19CBF4ED00E6A0E7 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2643D4FA19CBF4ED00E6A0E7 /* MainViewController.m */; };
 		269A303019D564E300A51498 /* ADPCMEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 269A302F19D564E300A51498 /* ADPCMEncoder.m */; };
+		26F407F719D7238C0004BFFE /* AudioHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F407F619D7238C0004BFFE /* AudioHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,7 @@
 		269A302E19D564E300A51498 /* ADPCMEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADPCMEncoder.h; sourceTree = "<group>"; };
 		269A302F19D564E300A51498 /* ADPCMEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADPCMEncoder.m; sourceTree = "<group>"; };
 		26A14EBA19B86688006B4B30 /* AudioHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioHandler.h; sourceTree = "<group>"; };
+		26F407F619D7238C0004BFFE /* AudioHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioHandler.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +136,7 @@
 				26426BD319758E5900DB7EA5 /* P2PConnector.h */,
 				26426BD419758E5900DB7EA5 /* P2PConnector.m */,
 				26A14EBA19B86688006B4B30 /* AudioHandler.h */,
+				26F407F619D7238C0004BFFE /* AudioHandler.m */,
 				2643D4F919CBF4ED00E6A0E7 /* MainViewController.h */,
 				2643D4FA19CBF4ED00E6A0E7 /* MainViewController.m */,
 				269A302E19D564E300A51498 /* ADPCMEncoder.h */,
@@ -268,6 +271,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				269A303019D564E300A51498 /* ADPCMEncoder.m in Sources */,
+				26F407F719D7238C0004BFFE /* AudioHandler.m in Sources */,
 				2641E0C819669B390087E12F /* TimeDataHandler.m in Sources */,
 				2641E08E196699110087E12F /* AppDelegate.m in Sources */,
 				2643D4FB19CBF4ED00E6A0E7 /* MainViewController.m in Sources */,
