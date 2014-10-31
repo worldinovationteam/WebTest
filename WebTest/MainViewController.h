@@ -19,6 +19,7 @@
     UIButton* call;
     UIButton* hangUp;
     CGSize screenSize;
+    AudioHandler* hand;
 }
 
 @property P2PConnector* connector;

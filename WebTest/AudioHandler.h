@@ -24,5 +24,6 @@ char data[PPBUF/2];
 
 -(BOOL)startSendingVoice;
 -(BOOL)startReceivingVoice;
+-(BOOL)stop;
 
 @end

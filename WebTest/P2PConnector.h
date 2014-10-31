@@ -26,6 +26,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
 #import <sys/socket.h>
 #import <sys/types.h>
 #import <netinet/in.h>
@@ -45,6 +46,7 @@
     BOOL isCalled;
     BOOL isTalking;
     NSString* ID;
+    AVAudioPlayer* player;
 }
 
 @property id <P2PConnectorDelegate> delegate;

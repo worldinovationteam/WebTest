@@ -82,6 +82,20 @@ AudioQueueRef inQueue,outQueue;
     isCalling=NO;
     isTalking=NO;
     
+    NSString *soundFilePath =
+    [[NSBundle mainBundle] pathForResource: @"siren1"
+                                    ofType: @"mp3"];
+    
+    NSURL *fileURL =
+    [[NSURL alloc] initFileURLWithPath: soundFilePath];
+    
+    AVAudioPlayer *newPlayer =
+    [[AVAudioPlayer alloc] initWithContentsOfURL: fileURL
+                                           error: nil];
+    player = newPlayer;
+    
+    [player prepareToPlay];
+    
     return self;
 }
 
@@ -438,6 +452,7 @@ AudioQueueRef inQueue,outQueue;
             isTalking=NO;
             isCalling=NO;
             isCalled=NO;
+            [player play];
             [NSThread detachNewThreadSelector:@selector(didReceiveHangUp) toTarget:delegate withObject:nil];
             
         //着信の場合
@@ -455,6 +470,7 @@ AudioQueueRef inQueue,outQueue;
                 NSLog(@"received responce when talking/not calling/being called");
                 continue;
             }
+            isCalled=NO;
             isCalling=NO;
             isTalking=YES;
             [NSThread detachNewThreadSelector:@selector(startSendingVoice) toTarget:self withObject:nil];
@@ -489,6 +505,8 @@ AudioQueueRef inQueue,outQueue;
     AudioStreamBasicDescription inDataFormat, outDataFormat;
     AudioQueueBufferRef inBuffer[3];
     AudioQueueBufferRef outBuffer[3];
+    
+    NSLog(@"isTalking=%d, isCalling=%d, isCalled=%d",isTalking,isCalling,isCalled);
     
     //フォーマットの設定
     
@@ -541,7 +559,7 @@ AudioQueueRef inQueue,outQueue;
     printf("output start %d\n",(int)stat);
     
     //マイク用キューの開始
-    stat=AudioQueueNewInput(&inDataFormat, AudioInputCallback, NULL, CFRunLoopGetCurrent(), kCFRunLoopCommonModes, 0, &inQueue);
+    stat=AudioQueueNewInput(&inDataFormat, AudioInputCallback, NULL, NULL, NULL, 0, &inQueue);
     if( stat ){
         printf("failed to make input queue %d\n",(int)stat);
         return NO;
@@ -571,6 +589,9 @@ void AudioInputCallback(
                                const AudioTimeStamp *inStartTime,
                                UInt32 inNumberPacketDescriptions,
                                const AudioStreamPacketDescription *inPacketDescs){
+    
+    NSLog(@"input callback");
+    
     //マイク用バッファがいっぱいになったら相手に送る
     int16_t* datapt= (int16_t *)(inBuffer->mAudioData);
     int16_t tmpdata[P2PBUF*4];
@@ -676,6 +697,8 @@ void AudioOutputCallback (
     int difference;
     char originalSample,tmpdata;
     
+    NSLog(@"output callback");
+    
     for( int j=0; j<P2PBUF*2; j++ ){
         
         tmpdata=receivedData[j/2];
@@ -779,6 +802,7 @@ void AudioOutputCallback (
         return NO;
     }
     
+    NSLog(@"hanging up...");
     if( isTalking==YES ){
         AudioQueueStop(inQueue, true);
         AudioQueueStop(outQueue, true);
@@ -793,7 +817,6 @@ void AudioOutputCallback (
     
     //通話切断を通知（#hup#を相手に送る)
     char* msg="#hup#";
-    NSLog(@"hanging up...");
     if(sendto(P2PSocket, msg, strlen(msg)+1, 0, (struct sockaddr*)&partAddr, sizeof(partAddr))<0){
         NSLog(@"failed");
         return NO;
@@ -807,6 +830,8 @@ void AudioOutputCallback (
     if( isConnected==NO ){
         return NO;
     }
+    
+    
     
     //通信切断を通知（#dis#を相手に送る)
     char* msg="#dis#";
@@ -827,3 +852,4 @@ void AudioOutputCallback (
 }
 
 @end
+

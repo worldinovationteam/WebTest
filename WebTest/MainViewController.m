@@ -9,6 +9,7 @@
 #import "MainViewController.h"
 #import "AppDelegate.h"
 
+
 @implementation MainViewController
 
 @synthesize connector;
@@ -51,7 +52,7 @@
     [hangUp setFrame:CGRectMake((screenSize.width-200)/2+100, 300, 200, 100)];
     [self.view addSubview:hangUp];
     
-    /*AudioHandler* hand=[[AudioHandler alloc]init];
+    /*hand=[[AudioHandler alloc]init];
     [hand startReceivingVoice];
     [hand startSendingVoice];*/
     
@@ -64,7 +65,7 @@
                                            serverPort:5000
                                            clientPort:6000
                                              delegate:self
-                                                   ID:@"iiii"];
+                                                   ID:@"aaaa"];
     for(int i=0; i<100; i++ ){
         if( [connector findPartner]==NO ){
             if( i==99 ){
@@ -98,6 +99,7 @@
     if( [connector hangUp]==YES ){
         isTalking.text=@"通話していません";
     }
+    [hand stop];
 }
 
 -(void)didReceiveMessage:(NSString *)message{

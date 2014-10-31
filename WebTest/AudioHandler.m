@@ -10,6 +10,8 @@
 
 @implementation AudioHandler
 
+AudioQueueRef inQueue,outQueue;
+
 int stepsizeTble[89] = {7, 8, 9, 10, 11, 12, 13, 14,
     16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60,
     66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209,
@@ -201,7 +203,6 @@ void AudioOutputtCallback (
 
 -(BOOL)startSendingVoice{
     AudioStreamBasicDescription dataFormat;
-    AudioQueueRef inQueue,outQueue;
     AudioQueueBufferRef inBuffer[NUMBUF];
     AudioQueueBufferRef outBuffer[NUMBUF];
     
@@ -273,7 +274,6 @@ void AudioOutputtCallback (
 
 -(BOOL)startReceivingVoice{
     AudioStreamBasicDescription dataFormat;
-    AudioQueueRef inQueue,outQueue;
     AudioQueueBufferRef inBuffer[NUMBUF];
     AudioQueueBufferRef outBuffer[NUMBUF];
     
@@ -320,6 +320,15 @@ void AudioOutputtCallback (
     printf("input start %d\n",(int)stat);
     
     NSLog(@"audio started");
+    return YES;
+}
+
+-(BOOL)stop{
+    AudioQueueStop(inQueue, true);
+    AudioQueueStop(outQueue, true);
+    AudioQueueDispose(inQueue, true);
+    AudioQueueDispose(outQueue, true);
+    NSLog(@"stopped talking");
     return YES;
 }
 

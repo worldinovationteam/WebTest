@@ -14,7 +14,7 @@
 		<string>https://github.com/worldinovationteam/WebTest.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>WebTest.xcodeproj/project.xcworkspace</string>
+	<string>WebTest.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>68AB5D8D9A9490B27DFBB62C6F3D59B16F14C7D0</key>
