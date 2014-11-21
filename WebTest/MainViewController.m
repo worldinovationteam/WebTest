@@ -65,7 +65,7 @@
                                            serverPort:5000
                                            clientPort:6000
                                              delegate:self
-                                                   ID:@"aaaa"];
+                                                   ID:@"iiii"];
     for(int i=0; i<100; i++ ){
         if( [connector findPartner]==NO ){
             if( i==99 ){

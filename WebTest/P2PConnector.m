@@ -55,7 +55,7 @@ int exP2PSocket;
 char receivedData[P2PBUF];
 AudioQueueRef inQueue,outQueue;
 
-@synthesize delegate, cliAddr, servAddr, partAddr, P2PSocket, flg, isConnected, isCalling, isCalled, isTalking, ID;
+@synthesize delegate, cliAddr, servAddr, partAddr, P2PSocket, flg, isConnected, isCalling, isCalled, isTalking, partnerID, ID;
 
 -(id)initWithServerAddr:(NSString *)addr serverPort:(int)sport clientPort:(int)cport delegate:(id<P2PConnectorDelegate>)object ID:(NSString *)idstr{
     
@@ -174,6 +174,7 @@ AudioQueueRef inQueue,outQueue;
     close(sockfd);
     
     NSString* bufStr=[NSString stringWithUTF8String:buf];
+    
     NSRange range1 = [bufStr rangeOfString:@"__"];
     NSString* partIP;
     if (range1.location != NSNotFound) {
@@ -190,8 +191,17 @@ AudioQueueRef inQueue,outQueue;
     }
     NSRange range3 = NSMakeRange(range1.location+range1.length, range2.location-range1.location);
     int partPort=[[bufStr substringWithRange:range3] intValue];
+    
+    NSRange range4 = [bufStr rangeOfString:@"=="];
+    if (range4.location==NSNotFound){
+        NSLog(@"cannot get partner's ID");
+        return NO;
+    }
+    
+    NSRange range5 = NSMakeRange(range2.location+range2.length, range4.location-range2.location);
+    partnerID = [bufStr substringWithRange:range5];
 
-    flg=[[bufStr substringFromIndex:range2.location+range2.length] intValue];
+    flg=[[bufStr substringFromIndex:range4.location+range4.length] intValue];
     
     //パートナーのアドレスを設定
     bzero((char*) &partAddr, sizeof(partAddr));

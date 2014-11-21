@@ -45,6 +45,7 @@
     BOOL isCalling;
     BOOL isCalled;
     BOOL isTalking;
+    NSString* partnerID;
     NSString* ID;
     AVAudioPlayer* player;
 }
@@ -59,6 +60,7 @@
 @property (readonly) BOOL isCalling;
 @property (readonly) BOOL isCalled;
 @property (readonly) BOOL isTalking;
+@property (readonly) NSString* partnerID;
 @property NSString* ID;
 
 -(id)initWithServerAddr:(NSString*)addr serverPort:(int)sport clientPort:(int)cport delegate:(id <P2PConnectorDelegate>)object ID:(NSString*)idstr;
