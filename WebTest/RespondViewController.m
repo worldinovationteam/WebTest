@@ -22,22 +22,25 @@
     
     screenSize=[[UIScreen mainScreen] bounds].size;
     self.view.backgroundColor=[UIColor blackColor];
+    int buttonheight=screenSize.height*0.1;
+    int buttonwidth=buttonheight*3;
+    int dropheight=screenSize.height*0.3;
     
     fr=[[UIImageView alloc]init];
     fr.image = [UIImage imageNamed:@"drop.png"];
-    fr.frame = CGRectMake(screenSize.width*0.3,screenSize.height*0.2,screenSize.width*0.4,screenSize.height*0.2);
+    fr.frame = CGRectMake((screenSize.width-dropheight)*0.5,screenSize.height*0.2,dropheight,dropheight);
     [self.view addSubview:fr];
     
     call=[UIButton buttonWithType:UIButtonTypeCustom];
     [call setBackgroundImage:[UIImage imageNamed:@"respond.png"] forState:UIControlStateNormal];
     [call addTarget:self action:@selector(startCalling:) forControlEvents:UIControlEventTouchUpInside];
-    [call setFrame:CGRectMake(screenSize.width*0.3,screenSize.height*0.41,screenSize.width*0.4,screenSize.height*0.2)];
+    [call setFrame:CGRectMake((screenSize.width-buttonwidth)*0.5,screenSize.height*0.2+dropheight+10,buttonwidth,buttonheight)];
     [self.view addSubview:call];
     
     hangUp=[UIButton buttonWithType:UIButtonTypeCustom];
     [hangUp setBackgroundImage:[UIImage imageNamed:@"exit.png"] forState:UIControlStateNormal];
     [hangUp addTarget:self action:@selector(stopCalling:) forControlEvents:UIControlEventTouchUpInside];
-    [hangUp setFrame:CGRectMake(screenSize.width*0.3,screenSize.height*0.41,screenSize.width*0.4,screenSize.height*0.2)];
+    [hangUp setFrame:CGRectMake((screenSize.width-buttonwidth)*0.5,screenSize.height*0.2+dropheight+10,buttonwidth,buttonheight)];
     
     label=[[UILabel alloc]init];
     label.textColor=[UIColor whiteColor];
@@ -51,11 +54,12 @@
 
 -(void)connect{
     [NSThread sleepForTimeInterval:1.0f];
+    int port=(arc4random()%40000)+1024;
     connector=[[P2PConnector alloc]initWithServerAddr:@"153.121.70.32"
                                            serverPort:5000
-                                           clientPort:6000
+                                           clientPort:port
                                              delegate:self
-                                                   ID:@"菅村"];
+                                                   ID:@"齋藤"];
     for(int i=0; i<100; i++ ){
         if( [connector findPartner]==NO ){
             if( i==99 ){

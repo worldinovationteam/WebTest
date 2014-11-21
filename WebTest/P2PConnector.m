@@ -189,7 +189,8 @@ AudioQueueRef inQueue,outQueue;
         NSLog(@"cannot get partner's port number");
         return NO;
     }
-    NSRange range3 = NSMakeRange(range1.location+range1.length, range2.location-range1.location);
+    
+    NSRange range3 = NSMakeRange(range1.location+range1.length, range2.location-range1.location-range1.length);
     int partPort=[[bufStr substringWithRange:range3] intValue];
     
     NSRange range4 = [bufStr rangeOfString:@"=="];
@@ -198,7 +199,7 @@ AudioQueueRef inQueue,outQueue;
         return NO;
     }
     
-    NSRange range5 = NSMakeRange(range2.location+range2.length, range4.location-range2.location);
+    NSRange range5 = NSMakeRange(range2.location+range2.length, range4.location-range2.location-range2.length);
     partnerID = [bufStr substringWithRange:range5];
 
     flg=[[bufStr substringFromIndex:range4.location+range4.length] intValue];
