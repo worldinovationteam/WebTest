@@ -15,6 +15,7 @@
 @implementation RespondViewController
 
 @synthesize connector;
+@synthesize myName;
 
 - (void)viewDidLoad
 {
@@ -42,6 +43,12 @@
     [hangUp addTarget:self action:@selector(stopCalling:) forControlEvents:UIControlEventTouchUpInside];
     [hangUp setFrame:CGRectMake((screenSize.width-buttonwidth)*0.5,screenSize.height*0.2+dropheight+10,buttonwidth,buttonheight)];
     
+    back=[UIButton buttonWithType:UIButtonTypeCustom];
+    [back setBackgroundImage:[UIImage imageNamed:@"return.png"] forState:UIControlStateNormal];
+    [back addTarget:self action:@selector(back:) forControlEvents:UIControlEventTouchUpInside];
+    [back setFrame:CGRectMake((screenSize.width-buttonwidth)*0.5,screenSize.height*0.2+dropheight+10,buttonwidth,buttonheight)];
+
+    
     label=[[UILabel alloc]init];
     label.textColor=[UIColor whiteColor];
     label.textAlignment=NSTextAlignmentCenter;
@@ -59,10 +66,10 @@
                                            serverPort:5000
                                            clientPort:port
                                              delegate:self
-                                                   ID:@"法月"];
-    for(int i=0; i<100; i++ ){
+                                                   ID:/*myName*/@"noi"];
+    for(int i=0; i<20; i++ ){
         if( [connector findPartner]==NO ){
-            if( i==99 ){
+            if( i==19 ){
                 return;
             }else{
                 continue;
@@ -100,9 +107,15 @@
 -(IBAction)stopCalling:(id)sender{
     if( [connector hangUp]==YES ){
         [hangUp removeFromSuperview];
+        [self.view addSubview:back];
         label.text=@"通話終了しました";
     }
 }
+
+-(IBAction)back:(id)sender{
+    
+}
+
 
 -(void)didReceiveMessage:(NSString *)message{
     NSLog(@"received message: %@",message);
@@ -111,6 +124,7 @@
 -(void)didReceiveHangUp{
     NSLog(@"partner has hung up");
     [hangUp removeFromSuperview];
+    [self.view addSubview:back];
     label.text=@"通話終了しました";
 }
 

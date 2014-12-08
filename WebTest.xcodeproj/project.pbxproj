@@ -10,6 +10,7 @@
 		262E44F71972129900E15191 /* XMLDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 262E44F61972129900E15191 /* XMLDelegate.m */; };
 		2632B9921A35CC49003370F6 /* anzu copy.xcf in Resources */ = {isa = PBXBuildFile; fileRef = 2632B9901A35CC49003370F6 /* anzu copy.xcf */; };
 		2632B9931A35CC49003370F6 /* anzuaseri copy.xcf in Resources */ = {isa = PBXBuildFile; fileRef = 2632B9911A35CC49003370F6 /* anzuaseri copy.xcf */; };
+		263D4E541A35F8D000710B02 /* return.png in Resources */ = {isa = PBXBuildFile; fileRef = 263D4E531A35F8D000710B02 /* return.png */; };
 		2641E07E196699110087E12F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2641E07D196699110087E12F /* Foundation.framework */; };
 		2641E080196699110087E12F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2641E07F196699110087E12F /* CoreGraphics.framework */; };
 		2641E082196699110087E12F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2641E081196699110087E12F /* UIKit.framework */; };
@@ -50,6 +51,7 @@
 		262E44F61972129900E15191 /* XMLDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLDelegate.m; sourceTree = "<group>"; };
 		2632B9901A35CC49003370F6 /* anzu copy.xcf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "anzu copy.xcf"; sourceTree = "<group>"; };
 		2632B9911A35CC49003370F6 /* anzuaseri copy.xcf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "anzuaseri copy.xcf"; sourceTree = "<group>"; };
+		263D4E531A35F8D000710B02 /* return.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = return.png; sourceTree = "<group>"; };
 		2641E07A196699110087E12F /* WebTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WebTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2641E07D196699110087E12F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		2641E07F196699110087E12F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -144,6 +146,7 @@
 		2641E083196699110087E12F /* WebTest */ = {
 			isa = PBXGroup;
 			children = (
+				263D4E531A35F8D000710B02 /* return.png */,
 				2632B9901A35CC49003370F6 /* anzu copy.xcf */,
 				2632B9911A35CC49003370F6 /* anzuaseri copy.xcf */,
 				26C15E641A1FAD1C0069CFE8 /* drop.png */,
@@ -285,6 +288,7 @@
 				2632B9921A35CC49003370F6 /* anzu copy.xcf in Resources */,
 				2632B9931A35CC49003370F6 /* anzuaseri copy.xcf in Resources */,
 				2641E088196699110087E12F /* InfoPlist.strings in Resources */,
+				263D4E541A35F8D000710B02 /* return.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
