@@ -59,7 +59,7 @@
                                            serverPort:5000
                                            clientPort:port
                                              delegate:self
-                                                   ID:@"齋藤"];
+                                                   ID:@"法月"];
     for(int i=0; i<100; i++ ){
         if( [connector findPartner]==NO ){
             if( i==99 ){
