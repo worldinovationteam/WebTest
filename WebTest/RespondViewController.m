@@ -48,7 +48,6 @@
     [back addTarget:self action:@selector(back:) forControlEvents:UIControlEventTouchUpInside];
     [back setFrame:CGRectMake((screenSize.width-buttonwidth)*0.5,screenSize.height*0.2+dropheight+10,buttonwidth,buttonheight)];
 
-    
     label=[[UILabel alloc]init];
     label.textColor=[UIColor whiteColor];
     label.textAlignment=NSTextAlignmentCenter;
@@ -67,9 +66,12 @@
                                            clientPort:port
                                              delegate:self
                                                    ID:/*myName*/@"noi"];
-    for(int i=0; i<20; i++ ){
+    for(int i=0; i<5; i++ ){
         if( [connector findPartner]==NO ){
-            if( i==19 ){
+            if( i==4 ){
+                label.numberOfLines=2;
+                label.text=@"申し訳ありません\n 失敗しました";
+                [self.view addSubview:back];
                 return;
             }else{
                 continue;
